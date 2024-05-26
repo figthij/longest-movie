@@ -1,0 +1,168 @@
+"""
+Name: long movies
+Author: Erik Bailey
+Date: 06/01/2020
+Synoposis: finds longest movies on the imdb website
+"""
+import requests
+#requests access to certain things
+from requests import get
+#gets access
+from bs4 import BeautifulSoup
+#gets the web scraper
+import pandas as pd
+#used to organize data
+import numpy as np
+#used for working with arrays
+
+headers = {"Accept-Lanuage": "en-US, en;q=0.5"}
+#tells scraper to bring english
+# get english translated titles
+url = "https://www.imdb.com/search/title/?groups=top_1000&sort=runtime,desc"
+#url is variable used to get url
+results = requests.get(url, headers=headers)
+#request access to website
+
+soup = BeautifulSoup(results.text, "html.parser")
+#soup is variable to assignn beautiful soup to in order to get desired format 
+#by using html parser, soup allows python to read the page without making it a long string
+
+#store data in the following arrays
+titles = []
+years = []
+time = []
+imdb_ratings = []
+
+#<div class="lister-item mode-advanced">...</div>
+#above comment is us used to represent each of the movies
+movie_div = soup.find_all('div', class_='lister-item mode-advanced')
+#moviediv used to store all div containers with the class'lister-item mode-advanced'
+#findall extracts all div containersthat have a certain class attribute
+
+for container in movie_div:
+    name = container.h3.a.text
+    #name is what is used to store the titles data
+    #h3 and .a tell which tag
+    #text tells the scraper to scrape in the <a> tag
+    titles.append(name)
+    
+    year = container.h3.find('span', class_='lister-item-year').text
+    #find is used to access particular tag that is in the parenthesis
+    years.append(year)
+    
+    runtime = container.find('span', class_='runtime').text if container.p.find('span', class_='runtime') else '-'
+    #if else says if there is data take it if not just put a -
+    time.append(runtime)
+    
+    imdb = float(container.strong.text)
+    #strong is a tag
+    #float turns text into a float
+    imdb_ratings.append(imdb)
+    
+movies = pd.DataFrame({
+    'movie': titles,
+    'timeMin': time,
+    'year': years,
+    'imdb': imdb_ratings,
+    })
+
+print(movies)
+'''
+#print(titles)
+#print(years)
+#print(time)
+#print(imdb_ratings)
+#print(metascores)
+#print(votes)
+#print(us_gross)'''
+'''
+import requests
+#requests access to certain things
+from requests import get
+#gets access
+from bs4 import BeautifulSoup
+#gets the web scraper
+import pandas as pd
+#used to organize data
+import numpy as np
+#used for working with arrays
+
+headers = {"Accept-Lanuage": "en-US, en;q=0.5"}
+##tells scraper to bring english
+# get english translated titles
+url = "https://www.imdb.com/search/title/?groups=top_1000&sort=runtime,desc"
+#url is variable used to get url
+results = requests.get(url, headers=headers)
+#request access to website
+
+soup = BeautifulSoup(results.text, "html.parser")
+#soup is variable to assignn beautiful soup to in order to get desired format 
+#by using html parser, soup allows python to read the page without making it a long string
+
+#print(soup.prettify())
+
+#prints what was grabbed in a tree like format
+
+#store data in the following arrays
+titles = []
+years = []
+time = []
+imdb_ratings = []
+metascores = []
+votes = []
+us_gross = []
+
+#<div class="lister-item mode-advanced">...</div>
+#above comment is us used to represent each of the movies
+movie_div = soup.find_all('div', class_='lister-item mode-advanced')
+#moviediv used to store all div containers with the class'lister-item mode-advanced'
+#findall extracts all div containersthat have a certain class attribute
+#print(movie_div)
+
+for container in movie_div:
+    name = container.h3.a.text
+    #name is what is used to store the titles data
+    #container is the i in this for loop
+    #h3 and .a tell which tag
+    #text tells the scraper to scrape in the <a> tag
+    titles.append(name)
+    
+    year = container.h3.find('span', class_='lister-item-year').text
+    #find is used to access particular tag that is in the parenthesis
+    years.append(year)
+    
+    runtime = container.find('span', class_='runtime').text if container.p.find('span', class_='runtime') else '-'
+    #if else says if there is data take it if not just put a -
+    time.append(runtime)
+    
+    imdb = float(container.strong.text)
+    #strong is a tag
+    #float turns text into a float
+    imdb_ratings.append(imdb)
+    
+    m_score = container.find('span', class_='metascore').text if container.find('span', class_='metascore') else '-'
+    metascores.append(m_score)
+    
+    nv = container.find_all('span', attrs={'name': 'nv'})
+    
+    vote = nv[0].text
+    votes.append(vote)
+    
+    grosses = nv[1].text if len(nv) > 1 else '-'
+    us_gross.append(grosses)
+
+movies = pd.DataFrame({
+    'movie': titles,
+    'timeMin': time,
+    'year': years,
+    'imdb': imdb_ratings,
+    })
+
+print(movies)
+#print(titles)
+#print(years)
+#print(time)
+#print(imdb_ratings)
+#print(metascores)
+#print(votes)
+#print(us_gross)'''
